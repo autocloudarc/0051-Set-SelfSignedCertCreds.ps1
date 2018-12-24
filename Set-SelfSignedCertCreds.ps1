@@ -295,20 +295,12 @@ function New-PromptObjects
 
 function Install-AdModuleIfRequired
 {
-    # Add the RSAT-AD-PowerShell feature so that the ActiveDirectory modules can be used in the remainder of the script.
-    if (-not((Get-WindowsFeature -Name "RSAT-AD-PowerShell").InstallState))
-    {
-        Install-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature -IncludeManagementTools -Verbose
-    } # end if
-} # end function
-function Install-AdModuleIfRequired
-{
     [CmdletBinding()]
     param()
     # Install the ActiveDirectory module
-    If (-not(Get-WindowsFeature -Name RSAT-AD-PowerShell))
+    If (-not(Get-WindowsFeature -Name RSAT-AD-PowerShell).InstallState)
     {
-        Install-WindowsFeature -Name RSAT-AD-PowerShell -IncludeManagementTools -Verbose -Confirm:$false
+        Install-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeManagementTools -Verbose -Confirm:$false
     } # end if
 
     # Import the ActiveDirectory module so Get-ADUser can be used later
