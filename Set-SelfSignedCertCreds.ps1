@@ -657,27 +657,32 @@ Stop-Transcript -ErrorAction SilentlyContinue -Verbose
 	----           ---------     --------- --------      ----                                                                                                                                                                                           ---------------
 	SetCredTest                            FileSystem    \\<server>\c$
 
-	To test scheduling a scheduled job, us the following code snippet.
-
-	# 1.0: Register scheduled job using a script block
-	Register-ScheduledJob -Name psjob2 -ScriptBlock {dir c:\} -Credential $svcAccountCred
-	$trigger1 = New-JobTrigger -At (Get-Date).AddMinutes(2) -Once
-	Add-JobTrigger -Name psjob2 -Trigger $trigger1
-
-	OR
+	To test scheduling a scheduled job, us the following code snippets.
 
 	# 2.0: Register scheduled job using a script file, where c:\scripts\Set-CredTest.ps1 contains the code:
-	# dir c:\
-	Register-ScheduledJob -Name psjob3 -FilePath {c:\scripts\Set-CredTest.ps1} -Credential $svcAccountCred
-	$trigger1 = New-JobTrigger -At (Get-Date).AddMinutes(2) -Once
-	Add-JobTrigger -Name psjob2 -Trigger $trigger1
+    # Get-ChildItem -Path c:\ -Recurse
 
-	# 2.1: Register scheduled job using a script block.
-		Register-ScheduledJob -Name PSJob -ScriptBlock { Get-ChildItem -Path \\$remotNodes\c$ -Recurse } -Credential $svcAccount -Verbose
-		$trigger = New-JobTrigger -At (Get-Date).AddSeconds(10) -Once -Verbose
-		Add-JobTrigger -Name PSJob -Trigger $trigger -Verbose
+    # Register the job using the script file
+    Register-ScheduledJob -Name psjob3 -FilePath {c:\scripts\Set-CredTest.ps1} -Credential $svcAccountCred
 
-	The scheduled jobs will appear at in the Task Scheduler at the path:
-	Microsoft\Windows\PowerShell\ScheduledJobs
+    # Create a trigger for two minutes from now
+    $trigger1 = New-JobTrigger -At (Get-Date).AddMinutes(2) -Once
+
+    # Add the trigger to the job
+    Add-JobTrigger -Name psjob2 -Trigger $trigger1
+
+    # 2.1: Register scheduled job using a script block.
+
+    # Register a job using a script block
+    Register-ScheduledJob -Name PSJob -ScriptBlock { Get-ChildItem -Path \\$remotNodes\c$ -Recurse } -Credential $svcAccount -Verbose
+
+    # Create a trigger for 10 seconds from now
+    $trigger = New-JobTrigger -At (Get-Date).AddSeconds(10) -Once -Verbose
+
+    # Add the trigger to the job
+    Add-JobTrigger -Name PSJob -Trigger $trigger -Verbose
+
+    # The scheduled jobs will appear at in the Task Scheduler at the path:
+	# Microsoft\Windows\PowerShell\ScheduledJobs
 #>
 #endregion INTEGRATION TESTING - MANUAL
