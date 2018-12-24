@@ -9,7 +9,7 @@ Secure credentials in automated scripts.
 .DESCRIPTION
 Scripts will use a client authentication certificate associated with a service account which has at least Builtin\Administrator privileges.
 This certificate will be imported to the current user certificate store for the service account.
-An example scenario is: A script to create an Install From Media backup using ntdsutil on our Domain Controllers. The certificate will be tied to the credential by using the thumbprint property.
+The certificate will be tied to the credential by using the thumbprint property.
 
 .PARAMETER netDirectory
 Directory path where the encrypted password file pw.txt, clear-text username file upn.txt and the self-signed client authentication certificate PSScriptCipherCert.pfx will be stored.
@@ -33,9 +33,6 @@ This parameter will suppress prompting so that automated script that dot source 
 For this to work the following conditions must first be satisfied:
 1. The certificate must already be installed in the current user personal store of the logged on user that will be running the script which dot sources this one (Set-SelfSignedCertCreds.ps1)
 2. The ExportCert switch must not be used since the intent is to use the existing certificate already instealled instead of creating a new one.
-
-.PARAMETER targetMachine
-This is an optional parameter of one or more remote target systems to test authentication for a remote PowerShell commands using the retrieved and decrypted credential set.
 
 .EXAMPLE
 [WITH the -ExportCert switch parameter]
@@ -116,15 +113,16 @@ We grant You a nonexclusive, royalty-free right to use and modify the Sample Cod
 This posting is provided "AS IS" with no warranties, and confers no rights.
 
 .LINK
-1: https://developer.microsoft.com/en-us/windows/downloads/sdk-archive
-2: https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/makecert
-3: https://www.sqlshack.com/how-to-secure-your-passwords-with-powershell/
-4: https://www.pdq.com/blog/secure-password-with-powershell-encrypting-credentials-part-1/
-5: https://www.cgoosen.com/2015/02/using-a-certificate-to-encrypt-credentials-in-automated-powershell-scripts/
-6: https://docs.microsoft.com/en-us/powershell/module/pkiclient/new-selfsignedcertificate?view=win10-ps
-7: https://docs.microsoft.com/en-us/powershell/module/pkiclient/export-pfxcertificate?view=win10-ps
-8: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.security/protect-cmsmessage?view=powershell-6
-9: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.security/unprotect-cmsmessage?view=powershell-6
+1: https://www.codeguru.com/columns/dotnet/using-self-signed-certificates-to-encrypt-text.html
+2: https://www.cgoosen.com/2015/02/using-a-certificate-to-encrypt-credentials-in-automated-powershell-scripts/
+3: https://www.cgoosen.com/2016/05/using-a-certificate-to-encrypt-credentials-in-automated-powershell-scripts-an-update/
+4: https://www.iso.org/obp/ui/#iso:std:iso-iec:27005:ed-3:v1:en
+5: https://www.iso.org/isoiec-27001-information-security.html
+6: https://www.techrepublic.com/blog/data-center/powershell-code-to-store-user-credentials-encrypted-for-re-use/
+7: https://sid-500.com/2018/02/24/powershell-encrypt-and-store-your-passwords-and-use-them-for-remote-authentication-protect-cmsmessage/
+8: https://docs.microsoft.com/en-us/powershell/module/Microsoft.PowerShell.Security/ConvertFrom-SecureString?view=powershell-5.0
+9: https://en.wikipedia.org/wiki/Data_Protection_API#frb-inline
+10: http://www.powertheshell.com/searching-for-file-attributes/
 
 .COMPONENT
 Task Scheudler, Scripts, Authentication, Credentials, Certificates
