@@ -187,10 +187,6 @@ function New-LogFiles
     $TimeStamp = $TimeStamp.Replace(" ", "-")
     $TimeStamp = $TimeStamp.Replace(":", "")
 
-    # Construct log file full path
-    $LogFile = "$LogPrefix-LOG" + "-" + $env:computername + "-" + $TimeStamp + ".log"
-    $script:Log = Join-Path -Path $LogDirectory -ChildPath $LogFile
-
     # Construct transcript file full path
     $TranscriptFile = "$LogPrefix-TRANSCRIPT" + "-" + $TimeStamp + ".log"
     $script:Transcript = Join-Path -Path $LogDirectory -ChildPath $TranscriptFile
@@ -365,7 +361,6 @@ Write-Output "`$upnFile: $upnFile"
 $SummObj = [PSCustomObject]@{
     netDirectory    = $netDirectory;
     transcript      = $Transcript;
-    log             = $Log;
     exportCert      = $ExportCert;
     suppressPrompts = $SuppressPrompts;
 } #end $SummObj
