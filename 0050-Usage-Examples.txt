@@ -36,13 +36,13 @@ This command will import the self-signed certificate if required on a machine, r
     # Get-ChildItem -Path c:\ -Recurse
 
     # Register the job using the script file
-    Register-ScheduledJob -Name psjob3 -FilePath {F:\OneDrive\02.00.00.GENERAL\repos\git\scripts\0050\Set-CredTest.ps1} -Credential $svcAccountCred
+    Register-ScheduledJob -Name psjob3 -FilePath {F:\OneDrive\02.00.00.GENERAL\repos\0000-scripts\0050\Set-CredTest.ps1} -Credential $svcAccountCred
 
     # Create a trigger for two minutes from now
     $trigger1 = New-JobTrigger -At (Get-Date).AddMinutes(2) -Once
 
     # Add the trigger to the job
-    Add-JobTrigger -Name psjob2 -Trigger $trigger1
+    Add-JobTrigger -Name psjob3 -Trigger $trigger1
 
     # 2.1: Register scheduled job using a script block.
 
