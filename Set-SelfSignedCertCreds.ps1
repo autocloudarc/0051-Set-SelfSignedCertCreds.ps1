@@ -192,7 +192,7 @@ function New-LogFiles
     $script:Transcript = Join-Path -Path $LogDirectory -ChildPath $TranscriptFile
 
     # Create log and transcript files
-    New-Item -Path $Log, $Transcript -ItemType File -ErrorAction SilentlyContinue
+    New-Item -Path $Transcript -ItemType File -ErrorAction SilentlyContinue
 } # end function
 
 function script:New-Header
@@ -318,7 +318,6 @@ function Get-InitialValues
 #region INITIALIZE VALUES
 
 # Create Log file
-[string]$Log = $null
 [string]$Transcript = $null
 
 $scriptName = $MyInvocation.MyCommand.name
@@ -567,7 +566,6 @@ If (-not($SuppressPrompts))
     # Exit if user does not want to continue
     If ($ResponsesObj.pOpenLogsNow -in 'Y', 'YES')
     {
-        Start-Process -FilePath notepad.exe $Log -Verbose
         Start-Process -FilePath notepad.exe $Transcript -Verbose
         # Invoke-Item -Path $resultsPathCsv -Verbose
         Write-Output $EndOfScriptMessage 
