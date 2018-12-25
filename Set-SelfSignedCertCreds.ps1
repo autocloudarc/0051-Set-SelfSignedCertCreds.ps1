@@ -610,7 +610,7 @@ Stop-Transcript -ErrorAction SilentlyContinue -Verbose
     $trigger1 = New-JobTrigger -At (Get-Date).AddMinutes(2) -Once
 
     # Add the trigger to the job
-    Add-JobTrigger -Name psjob2 -Trigger $trigger1
+    Add-JobTrigger -Name psjob3 -Trigger $trigger1
 
     # 2.1: Register scheduled job using a script block.
 
