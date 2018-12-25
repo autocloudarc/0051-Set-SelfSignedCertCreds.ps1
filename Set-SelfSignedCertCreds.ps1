@@ -397,8 +397,8 @@ if (-not($SuppressPrompts))
     Until ($ResponsesObj.pProceed -eq "Y" -OR $ResponsesObj.pProceed -eq "YES" -OR $ResponsesObj.pProceed -eq "N" -OR $ResponsesObj.pProceed -eq "NO")
 
     # Record prompt and response in log
-    Write-Output -Output $PromptsObj.pVerifySummary  -Verbose
-    Write-Output -Output $ResponsesObj.pProceed  -Verbose
+    Write-Output $PromptsObj.pVerifySummary  -Verbose
+    Write-Output $ResponsesObj.pProceed  -Verbose
 }  # end if
 
 #region MAIN
@@ -542,11 +542,11 @@ else
 #region SUMMARY
 
 # Calculate elapsed time
-Write-WithTime -Output "Calculating script execution time..."  -Verbose
-Write-WithTime -Output "Getting current date/time..."  -Verbose
+Write-Output "Calculating script execution time..."  -Verbose
+Write-Output "Getting current date/time..."  -Verbose
 $StopTimer = Get-Date
 $EndTime = (((Get-Date -format u).Substring(0, 16)).Replace(" ", "-")).Replace(":", "")
-Write-WithTime -Output "Calculating elapsed time..."  -Verbose
+Write-Output "Calculating elapsed time..."  -Verbose
 $ExecutionTime = New-TimeSpan -Start $BeginTimer -End $StopTimer -Verbose
 
 $Footer = "SCRIPT COMPLETED AT: "
@@ -575,11 +575,11 @@ If (-not($SuppressPrompts))
         Start-Process -FilePath notepad.exe $Log -Verbose
         Start-Process -FilePath notepad.exe $Transcript -Verbose
         # Invoke-Item -Path $resultsPathCsv -Verbose
-        Write-WithTime -Output $EndOfScriptMessage 
+        Write-Output $EndOfScriptMessage 
     } #end condition
     ElseIf ($ResponsesObj.pOpenLogsNow -in 'N', 'NO')
     {
-        Write-WithTime -Output $EndOfScriptMessage 
+        Write-Output $EndOfScriptMessage 
         Stop-Transcript -Verbose -ErrorAction SilentlyContinue
     } #end condition
 } # end if
