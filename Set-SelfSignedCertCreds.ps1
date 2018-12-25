@@ -596,7 +596,7 @@ Stop-Transcript -ErrorAction SilentlyContinue -Verbose
 
 	Name           Used (GB)     Free (GB) Provider      Root                                                                                                                                                                                           CurrentLocation
 	----           ---------     --------- --------      ----                                                                                                                                                                                           ---------------
-	SetCredTest                            FileSystem    \\<server>\c$
+	SetCredTest                            FileSystem    \\<server>\SetCredTest
 
 	To test scheduling a scheduled job, us the following code snippets.
 
