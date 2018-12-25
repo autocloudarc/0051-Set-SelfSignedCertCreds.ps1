@@ -192,7 +192,7 @@ function Get-PSGalleryModule
     foreach ($Module in $ModulesToInstall)
     {
         # If module exists, update it
-        If (Get-Module -Name $Module -Repository $Repository)
+        If (Get-Module -Name $Module)
         {
             # To avoid multiple versions of a module is installed on the same system, first uninstall any previously installed and loaded versions if they exist
             Update-Module -Name $Module -Force -ErrorAction SilentlyContinue -Verbose
@@ -213,7 +213,6 @@ function Get-PSGalleryModule
 # bug: 12/9/2018: Commenting out due to error: Get-PSGalleryApiAvailability : PowerShell Gallery is currently unavailable.  Please try again later.
 Get-PSGalleryModule -ModulesToInstall "WriteToLogs"
 
-Update-Module -Name "WriteToLogs"
 #region FUNCTIONS
 function New-LogFiles
 {
