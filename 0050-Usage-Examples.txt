@@ -13,3 +13,49 @@ This command will import the self-signed certificate if required on a machine, r
 [WITHOUT the -ExportCert switch parameter and USING the -SuppressPrompts switch]
 .\Set-SelfSignedCertCreds.ps1 -netDirectory "\\azrfil1001.dev.adatum.com\CertEncryption" -logDirectory "\\azrfil1001.dev.adatum.com\logs" -SuppressPrompts -Verbose
 This command will import the self-signed certificate if required on a machine, retrieve the previously exported credentials, then use the certificate to decrypt the password component of the credential.
+
+#region INTEGRATION TESTING - MANUAL
+<#
+    Manual integration testing:
+    
+    To remove the currently installed certificate for re-testing the -ExportCert scenario, run the following command:
+    Get-ChildItem -Path cert:\currentuser\my | Where-Object { $_.Subject -match "-PSScriptCipherCert" } | Remove-Item -Force
+
+	To test a command interactively use the following expression:
+	New-PSDrive -PSProvider FileSystem -Root \\azrads1003.dev.adatum.com\SetCredTest -Name SetCredTest -Credential $svcAccountCred
+
+	A successfull result should look similar to the following output:
+
+	Name           Used (GB)     Free (GB) Provider      Root                                                                                                                                                                                           CurrentLocation
+	----           ---------     --------- --------      ----                                                                                                                                                                                           ---------------
+	SetCredTest                            FileSystem    \\<server>\SetCredTest
+
+	To test scheduling a scheduled job, us the following code snippets.
+
+	# 2.0: Register scheduled job using a script file, where F:\OneDrive\02.00.00.GENERAL\repos\git\scripts\0050\Set-CredTest.ps1 contains the code:
+    # Get-ChildItem -Path c:\ -Recurse
+
+    # Register the job using the script file
+    Register-ScheduledJob -Name psjob3 -FilePath {F:\OneDrive\02.00.00.GENERAL\repos\git\scripts\0050\Set-CredTest.ps1} -Credential $svcAccountCred
+
+    # Create a trigger for two minutes from now
+    $trigger1 = New-JobTrigger -At (Get-Date).AddMinutes(2) -Once
+
+    # Add the trigger to the job
+    Add-JobTrigger -Name psjob2 -Trigger $trigger1
+
+    # 2.1: Register scheduled job using a script block.
+
+    # Register a job using a script block
+    Register-ScheduledJob -Name PSJob -ScriptBlock { Get-ChildItem -Path \\$remotNodes\c$ -Recurse } -Credential $svcAccount -Verbose
+
+    # Create a trigger for 10 seconds from now
+    $trigger = New-JobTrigger -At (Get-Date).AddSeconds(10) -Once -Verbose
+
+    # Add the trigger to the job
+    Add-JobTrigger -Name PSJob -Trigger $trigger -Verbose
+
+    # The scheduled jobs will appear at in the Task Scheduler at the path:
+	# Microsoft\Windows\PowerShell\ScheduledJobs
+#>
+#endregion INTEGRATION TESTING - MANUAL
