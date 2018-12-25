@@ -413,7 +413,7 @@ else
 	The following actions will be performed:
 	1. Create a new self-signed SSL certificate.
 	2. Request password for the service account that will be used to execute scripts.
-	3. Encrypt the password.
+	3. Encrypt the service account password for $svcAccountUpn
 	4. Export the encrypted password to the $pwFile file stored at the path: $pwFilePath
 	5. Export the clear-text username that you provided as $svcAccountUpn to the path: $upnFilePath
 	6. Export the self-signed certificate PSScriptCipherCert.pfx with the password protected private key to the path: $pfxFilePath
