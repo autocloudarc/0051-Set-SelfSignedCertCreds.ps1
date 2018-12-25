@@ -211,7 +211,7 @@ function Get-PSGalleryModule
 
 # function: Get any PowerShellGallery.com modules required for this script.
 # bug: 12/9/2018: Commenting out due to error: Get-PSGalleryApiAvailability : PowerShell Gallery is currently unavailable.  Please try again later.
-# Get-PSGalleryModule -ModulesToInstall "WriteToLogs"
+Get-PSGalleryModule -ModulesToInstall "WriteToLogs"
 
 #region FUNCTIONS
 function New-LogFiles

@@ -1,15 +1,15 @@
 .EXAMPLE
 [WITH the -ExportCert switch parameter]
-.\Set-SecureCredentials.ps1 -netDirectory "\\jfkvhw02.us.prm02.net\data\PKI\CertEncryption" -logDirectory "D:\DATA\OneDrive\02.00.00.GENERAL\repos\git\0032-Set-SecureCredentials\log" -ExportCert -Verbose
+.\Set-SelfSignedCertCreds.ps1 -netDirectory "\\azrfil1001.dev.adatum.com\CertEncryption" -logDirectory "\\azrfil1001.dev.adatum.com\logs" -ExportCert -Verbose
 In this example, a new self-signed certificate will be created and installed. Service account credentials will be requested and the password encrypted and exported to a file share, along with the username.
 The certificate will also be exported, then removed from the current machine. The verbose switch is added to show details of certain operations.
 
 .EXAMPLE
 [WITHOUT the -ExportCert switch parameter]
-.\Set-SecureCredentials.ps1 -netDirectory "\\jfkvhw02.us.prm02.net\data\PKI\CertEncryption" -logDirectory "D:\DATA\OneDrive\02.00.00.GENERAL\repos\git\0032-Set-SecureCredentials\log" -Verbose
+.\Set-SelfSignedCertCreds.ps1 -netDirectory "\\azrfil1001.dev.adatum.com\CertEncryption" -logDirectory "\\azrfil1001.dev.adatum.com\logs" -Verbose
 This command will import the self-signed certificate if required on a machine, retrieve the previously exported credentials, then use the certificate to decrypt the password component of the credential.
 
 .EXAMPLE
 [WITHOUT the -ExportCert switch parameter and USING the -SuppressPrompts switch]
-.\Set-SecureCredentials.ps1 -netDirectory "\\jfkvhw02.us.prm02.net\data\PKI\CertEncryption" -logDirectory "D:\DATA\OneDrive\02.00.00.GENERAL\repos\git\0032-Set-SecureCredentials\log" -SuppressPrompts -Verbose
+.\Set-SelfSignedCertCreds.ps1 -netDirectory "\\azrfil1001.dev.adatum.com\CertEncryption" -logDirectory "\\azrfil1001.dev.adatum.com\logs" -SuppressPrompts -Verbose
 This command will import the self-signed certificate if required on a machine, retrieve the previously exported credentials, then use the certificate to decrypt the password component of the credential.
