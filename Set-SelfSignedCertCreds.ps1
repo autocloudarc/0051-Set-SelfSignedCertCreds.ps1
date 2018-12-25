@@ -590,7 +590,10 @@ Stop-Transcript -ErrorAction SilentlyContinue -Verbose
 
 #region INTEGRATION TESTING - MANUAL
 <#
-	Manual integration testing:
+    Manual integration testing:
+    
+    To remove the currently installed certificate for re-testing the -ExportCert scenario, run the following command:
+    Get-ChildItem -Path cert:\currentuser\my | Where-Object { $_.Subject -match "-PSScriptCipherCert" } | Remove-Item -Force
 
 	To test a command interactively use the following expression:
 	New-PSDrive -PSProvider FileSystem -Root \\<servername>\c$ -Name SetCredTest -Credential $svcAccountCred
