@@ -421,8 +421,8 @@ else
 	2. Request password for the service account that will be used to execute scripts.
 	3. Encrypt the password.
 	4. Export the encrypted password to the $pwFile file stored at the path: $pwFilePath
-	5. Exports the clear-text username that you provide in UPN format, i.e. svc.AccountName@domain.com to the path: $upnFilePath
-	6. Exports the self-signed certificate PSScriptCipherCert.pfx with the password protected private key to the path: $pfxFilePath
+	5. Export the clear-text username that you provide in UPN format, i.e. svc.AccountName@domain.com to the path: $upnFilePath
+	6. Export the self-signed certificate PSScriptCipherCert.pfx with the password protected private key to the path: $pfxFilePath
 
 	PLEASE PRESS [ENTER] TO CONTINUE OR [CTRL-C] TO QUIT.
 "@
