@@ -167,52 +167,6 @@ param
 Set-StrictMode -Version Latest
 #endregion INITIALIZE ENVIRONMENT
 
-#region BOOTSTRAP FUNCTIONS
-function Get-PSGalleryModule
-{
-    [CmdletBinding(PositionalBinding = $false)]
-    Param
-    (
-        # Required modules
-        [Parameter(Mandatory = $true,
-            HelpMessage = "Please enter the PowerShellGallery.com modules required for this script",
-            ValueFromPipeline = $true,
-            Position = 0)]
-        [ValidateNotNull()]
-        [ValidateNotNullOrEmpty()]
-        [string[]]$ModulesToInstall
-    ) #end param
-
-    # NOTE: The newest version of the PowerShellGet module can be found at: https://github.com/PowerShell/PowerShellGet/releases
-    # 1. Always ensure that you have the latest version
-
-    $Repository = "PSGallery"
-    Set-PSRepository -Name $Repository -InstallationPolicy Trusted
-    Install-PackageProvider -Name Nuget -ForceBootstrap -Force
-    foreach ($Module in $ModulesToInstall)
-    {
-        # If module exists, update it
-        If (Get-Module -Name $Module)
-        {
-            # To avoid multiple versions of a module is installed on the same system, first uninstall any previously installed and loaded versions if they exist
-            Update-Module -Name $Module -Force -ErrorAction SilentlyContinue -Verbose
-        } #end if
-        # If the modules aren't already loaded, install and import it
-        else
-        {
-            # https://www.powershellgallery.com/packages/WriteToLogs
-            Install-Module -Name $Module -Repository $Repository -Force -Verbose
-            Import-Module -Name $Module -Repository $Repository -Verbose
-        } #end If
-    } #end foreach
-} #end function
-
-#endregion BOOTSTRAP FUNCTIONS
-
-# function: Get any PowerShellGallery.com modules required for this script.
-# bug: 12/9/2018: Commenting out due to error: Get-PSGalleryApiAvailability : PowerShell Gallery is currently unavailable.  Please try again later.
-Get-PSGalleryModule -ModulesToInstall "WriteToLogs"
-
 #region FUNCTIONS
 function New-LogFiles
 {
@@ -392,7 +346,7 @@ $BeginTimer = Get-Date -Verbose
 Install-AdModuleIfRequired -Verbose
 
 # Request service account username
-Write-ToConsoleAndLog -Output "Requesting the service account username. (This will not be encrypted)" -Log $log
+Write-Output "Requesting the service account username. (This will not be encrypted)"
 Do
 {
     $svcAccount = Read-Host -Prompt "Enter service account username that will be used to run powershell scripts, i.e. svc.scripts. Do not include the UPN suffix: $($(Get-ADDomain).DnsRoot)"
@@ -425,13 +379,13 @@ New-PromptObjects -Verbose
 
 #endregion INITIALIZE VALUES
 
-Write-ToConsoleAndLog -Output $header.SeparatorDouble -Log $Log -Verbose
-Write-ToConsoleAndLog -Output $Header.Title -Log $Log -Verbose
-Write-ToConsoleAndLog -Output $header.SeparatorSingle -Log $Log -Verbose
+Write-Output $header.SeparatorDouble  -Verbose
+Write-Output $Header.Title  -Verbose
+Write-Output $header.SeparatorSingle  -Verbose
 
 # Display Summary of initial parameters and constructed values
-Write-ToConsoleAndLog -Output $SummObj -Log $Log -Verbose
-Write-ToConsoleAndLog -Output $header.SeparatorDouble -Log $Log -Verbose
+Write-Output $SummObj  -Verbose
+Write-Output $header.SeparatorDouble  -Verbose
 
 if (-not($SuppressPrompts))
 {
@@ -443,15 +397,15 @@ if (-not($SuppressPrompts))
     Until ($ResponsesObj.pProceed -eq "Y" -OR $ResponsesObj.pProceed -eq "YES" -OR $ResponsesObj.pProceed -eq "N" -OR $ResponsesObj.pProceed -eq "NO")
 
     # Record prompt and response in log
-    Write-ToLogOnly -Output $PromptsObj.pVerifySummary -Log $Log -Verbose
-    Write-ToLogOnly -Output $ResponsesObj.pProceed -Log $Log -Verbose
+    Write-Output -Output $PromptsObj.pVerifySummary  -Verbose
+    Write-Output -Output $ResponsesObj.pProceed  -Verbose
 }  # end if
 
 #region MAIN
 # Exit if user does not want to continue
 if ($ResponsesObj.pProceed -eq "N" -OR $ResponsesObj.pProceed -eq "NO")
 {
-    Write-ToConsoleAndLog -Output "Script terminated by user..." -Log $Log -Verbose
+    Write-Output "Script terminated by user..."  -Verbose
     PAUSE
     EXIT
 } #end if ne Y
@@ -474,44 +428,44 @@ else
 "@
 
         # List operations provided by the ExportCert switch
-        Write-ToConsoleAndLog -Output $ExportCertMessage -Log $log -Verbose
+        Write-output $ExportCertMessage  -Verbose
         pause
-        Write-ToConsoleAndLog -Output "" -Log $log -Verbose
+        Write-output ""  -Verbose
 
         # Check for password file
-        Write-ToConsoleAndLog -Output "Checking for $pwFilePath and creating it if required" -Log $log
+        Write-output "Checking for $pwFilePath and creating it if required" 
         if (-not(Test-Path -Path $pwFilePath))
         {
             New-Item -Path $pwFilePath -ItemType File -Force -Verbose
         } # end if
 
         # Check for username file
-        Write-ToConsoleAndLog -Output "Checking for $upnFilePath and creating it if required" -Log $log
+        Write-output "Checking for $upnFilePath and creating it if required" 
         if (-not(Test-Path -Path $upnFilePath))
         {
             New-Item -Path $upnFilePath -ItemType File -Force -Verbose
         } # end if
 
         # Check if certificate is already installed
-        Write-ToConsoleAndLog -Output "Checking for self-signed certificate $($SelfSignedCertParams.FriendlyName) at $($SelfSignedCertParams.CertStoreLocation) and creating it if required" -Log $log
+        Write-output "Checking for self-signed certificate $($SelfSignedCertParams.FriendlyName) at $($SelfSignedCertParams.CertStoreLocation) and creating it if required" 
         If (-not(Get-ChildItem -Path $SelfSignedCertParams.CertStoreLocation | Where-Object {$_.Subject -match "$($SelfSignedCertParams.Subject)"}))
         {
             # Create and install certificate
-            Write-ToConsoleAndLog -Output "Creating the $($SelfSignedCertParams.FriendlyName) self-signed certificate and installing at $($SelfSignedCertParams.CertStoreLocation) ." -Log $log
+            Write-output "Creating the $($SelfSignedCertParams.FriendlyName) self-signed certificate and installing at $($SelfSignedCertParams.CertStoreLocation) ." 
             # Create new Self-Signed certificate with splatted parameters
             New-SelfSignedCertificate @SelfSignedCertParams -Verbose
         } # end if
         # Get certificate
-        Write-ToConsoleAndLog -Output "Retrieving the installed certificate $($SelfSignedCertParams.FriendlyName) so it can be used for encrypting the service account password." -Log $log
+        Write-output "Retrieving the installed certificate $($SelfSignedCertParams.FriendlyName) so it can be used for encrypting the service account password." 
         # Retrieve the installed certificate
         $exportedCert = Get-ChildItem -Path $SelfSignedCertParams.CertStoreLocation | Where-Object {$_.Subject -match "$($SelfSignedCertParams.Subject)"}
 
         # Request service account password
-        Write-ToConsoleAndLog -Output "Requesting the service account password. (This will be encrypted)" -Log $log
+        Write-output "Requesting the service account password. (This will be encrypted)" 
         $cred = Get-Credential -Message "Enter the service account password that will be used to execute scripts." -UserName $svcAccountUpn
 
         # Encrypt service account password
-        Write-ToConsoleAndLog -Output "Encrypting service account password." -Log $log
+        Write-output "Encrypting service account password." 
         $svcAccountName = $cred.GetNetworkCredential().UserName
         $svcAccountPassword = $cred.GetNetworkCredential().Password
         $EncodedPwd = [System.Text.Encoding]::UTF8.GetBytes($svcAccountPassword)
@@ -519,25 +473,25 @@ else
         $EncryptedPwd = [System.Convert]::ToBase64String($EncryptedBytes)
 
         # Write service account username to UPN file
-        Write-ToConsoleAndLog -Output "Exporting service account username: $svcAccountName to $upnFilePath." -Log $log
+        Write-output "Exporting service account username: $svcAccountName to $upnFilePath." 
         Set-Content -Path $upnFilePath -Value $svcAccountName -Force -Verbose
 
         # Write encrypted password to shared password file
-        Write-ToConsoleAndLog -Output "Exporting service account password for $svcAccountName to $pwFilePath." -Log $log -Verbose
+        Write-output "Exporting service account password for $svcAccountName to $pwFilePath."  -Verbose
         Set-Content -Path $pwFilePath -Value $EncryptedPwd -Force -Verbose
 
         # Show username
-        Write-ToConsoleAndLog -Output "Showing exported [username] $svcAccountName from $upnFilePath." -Log $log -Verbose
+        Write-output "Showing exported [username] $svcAccountName from $upnFilePath."  -Verbose
         Write-Output "Service account name"
         Get-Content -Path $upnFilePath -Verbose
 
         # Show encrypted password
-        Write-ToConsoleAndLog -Output "Showing exported encrypted [password] for $svcAccountName from $pwFilePath." -Log $log -Verbose
+        Write-output "Showing exported encrypted [password] for $svcAccountName from $pwFilePath."  -Verbose
         Get-Content -Path $pwFilePath -Verbose
 
         # Get-PrivateKeyCredentials
         # Export certificate
-        Write-ToConsoleAndLog -Output "Requesting private key password for certificate $($SelfSignedCertParams.Subject) and exporting to $pfxFilePath." -Log $log -Verbose
+        Write-output "Requesting private key password for certificate $($SelfSignedCertParams.Subject) and exporting to $pfxFilePath."  -Verbose
         Export-PfxCertificate -FilePath $pfxFilePath -Cert $exportedCert -Password $(Get-PrivateKeyCredentials) -Force -Verbose
     } # end if
     # If the -ExportCert switch parameter was NOT included in the command, then import self-signed certificate if required, then retrieve and decrypt the service account credentials using the certificate.
@@ -554,32 +508,32 @@ else
 
 			PLEASE PRESS [ENTER] TO CONTINUE OR [CTRL-C] TO QUIT.
 "@
-            Write-ToConsoleAndLog -Output $ImportCertMessage -Log $log -Verbose
+            Write-output $ImportCertMessage  -Verbose
             pause
         } # end if
 
         # Import certificate
-        Write-ToConsoleAndLog -Output "Importing certificate $($SelfSignedCertParams.Subject) into certificate store location $($SelfSignedCertparams.CertStoreLocation) if required." -Log $log -Verbose
+        Write-output "Importing certificate $($SelfSignedCertParams.Subject) into certificate store location $($SelfSignedCertparams.CertStoreLocation) if required."  -Verbose
         if (-not(Get-ChildItem -Path $SelfSignedCertParams.CertStoreLocation | Where-Object {$_.Subject -match "$($SelfSignedCertParams.Subject)"}))
         {
             Import-PfxCertificate -FilePath $pfxFilePath -CertStoreLocation $SelfSignedCertParams.CertStoreLocation -Exportable -Password $(Get-PrivateKeyCredentials) -Verbose
         } # end if
 
         # Get service account username
-        Write-ToConsoleAndLog -Output "Retrieving clear-text service account username" -Log $log -Verbose
+        Write-output "Retrieving clear-text service account username"  -Verbose
         $clearTextUpn = Get-Content -Path $upnFilePath
 
         # Get service account password and decrypt it
-        Write-ToConsoleAndLog -Output "Retrieving encrypted service account password and decrypting it" -Log $log -Verbose
+        Write-output "Retrieving encrypted service account password and decrypting it"  -Verbose
         $DecryptedPwd = Get-SvcAccountCredential
 
         # Create secure credential objects
-        Write-ToConsoleAndLog -Output "Constructing credential set to use in PowerShell commands and scripts" -Log $log -Verbose
+        Write-output "Constructing credential set to use in PowerShell commands and scripts"  -Verbose
         $SecurePwd = $DecryptedPwd | ConvertTo-SecureString -AsPlainText -Force
         $svcAccountCred = [pscredential]::new($clearTextUpn, $SecurePwd)
 
         # Show credentials
-        Write-ToConsoleAndLog -Output "Showing constructed credential set `$svcAccountCred" -Log $log -Verbose
+        Write-output "Showing constructed credential set `$svcAccountCred"  -Verbose
         $svcAccountCred
     } # end else
 } # end else
@@ -588,20 +542,20 @@ else
 #region SUMMARY
 
 # Calculate elapsed time
-Write-WithTime -Output "Calculating script execution time..." -Log $Log -Verbose
-Write-WithTime -Output "Getting current date/time..." -Log $Log -Verbose
+Write-WithTime -Output "Calculating script execution time..."  -Verbose
+Write-WithTime -Output "Getting current date/time..."  -Verbose
 $StopTimer = Get-Date
 $EndTime = (((Get-Date -format u).Substring(0, 16)).Replace(" ", "-")).Replace(":", "")
-Write-WithTime -Output "Calculating elapsed time..." -Log $Log -Verbose
+Write-WithTime -Output "Calculating elapsed time..."  -Verbose
 $ExecutionTime = New-TimeSpan -Start $BeginTimer -End $StopTimer -Verbose
 
 $Footer = "SCRIPT COMPLETED AT: "
 $EndOfScriptMessage = "End of script!"
 
-Write-ToConsoleAndLog -Output $header.SeparatorDouble -Log $Log -Verbose
-Write-ToConsoleAndLog -Output "$Footer $EndTime" -Log $Log -Verbose
-Write-ToConsoleAndLog -Output "TOTAL SCRIPT EXECUTION TIME[hh:mm:ss]: $ExecutionTime" -Log $Log -Verbose
-Write-ToConsoleAndLog -Output $header.SeparatorDouble -Log $Log -Verbose
+Write-output $header.SeparatorDouble  -Verbose
+Write-output "$Footer $EndTime"  -Verbose
+Write-output "TOTAL SCRIPT EXECUTION TIME[hh:mm:ss]: $ExecutionTime"  -Verbose
+Write-output $header.SeparatorDouble  -Verbose
 
 # Review deployment logs
 # Prompt to open logs
@@ -621,11 +575,11 @@ If (-not($SuppressPrompts))
         Start-Process -FilePath notepad.exe $Log -Verbose
         Start-Process -FilePath notepad.exe $Transcript -Verbose
         # Invoke-Item -Path $resultsPathCsv -Verbose
-        Write-WithTime -Output $EndOfScriptMessage -Log $Log
+        Write-WithTime -Output $EndOfScriptMessage 
     } #end condition
     ElseIf ($ResponsesObj.pOpenLogsNow -in 'N', 'NO')
     {
-        Write-WithTime -Output $EndOfScriptMessage -Log $Log
+        Write-WithTime -Output $EndOfScriptMessage 
         Stop-Transcript -Verbose -ErrorAction SilentlyContinue
     } #end condition
 } # end if
