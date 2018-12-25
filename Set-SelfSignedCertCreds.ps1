@@ -17,7 +17,7 @@ You may find it convenient to specify a server file share path, i.e. \\<server>\
 This way, you can log on with the same service account on another machine and import the same decryption certificate to decrypt the password during script execution when required.
 
 .PARAMETER logDirectory
-Log directory for transcript and custom logs, i.e. "\\<server>\<share>\logs"
+Log directory for transcript, i.e. "\\<server>\<share>\logs"
 
 .PARAMETER ExportCert
 This is a switched parameter that when specified performs the following actions:
@@ -49,7 +49,7 @@ This command will import the self-signed certificate if required on a machine, r
 [WITHOUT THE -ExportCert AND WITH the -SuppressPrompts switch parameter]
 .\Set-SelfSignedCertCreds.ps1 -netDirectory "\\<server>\<share>\<directory>" -logDirectory "\\<server>\<share>\logs" -SuppressPrompts -Verbose
 This command will import the self-signed certificate if required on a machine, retrieve the previously exported credentials, then use the certificate to decrypt the password component of the credential.
-In this case, all interactive prompts will be suppressed, but transcript and custom logging will continue.
+In this case, all interactive prompts will be suppressed, but transcript logging will continue.
 This switch is intended for non-interactive scenarios such as dot sourcing this script from another in order to retrieve the service account credential set for use in the main script.
 
 To test a command interactively use the following expression:
