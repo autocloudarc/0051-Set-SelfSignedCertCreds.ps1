@@ -358,6 +358,7 @@ Write-Output "`$upnFile: $upnFile"
 # Populate summary display object
 # Add properties and values
 $SummObj = [PSCustomObject]@{
+    svcAccountUpn = $svcAccountUpn;
     netDirectory    = $netDirectory;
     transcript      = $Transcript;
     exportCert      = $ExportCert;
