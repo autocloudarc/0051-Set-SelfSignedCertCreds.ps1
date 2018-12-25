@@ -252,9 +252,6 @@ function Install-AdModuleIfRequired
     {
         Install-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeManagementTools -Verbose -Confirm:$false
     } # end if
-
-    # Import the ActiveDirectory module so Get-ADUser can be used later
-    Import-Module -Name ActiveDirectory
 } # end function
 function Get-SvcAccountCredential
 {

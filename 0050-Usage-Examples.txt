@@ -22,18 +22,18 @@ This command will import the self-signed certificate if required on a machine, r
     Get-ChildItem -Path cert:\currentuser\my | Where-Object { $_.Subject -match "-PSScriptCipherCert" } | Remove-Item -Force
 
 	To test a command interactively use the following expression:
-	New-PSDrive -PSProvider FileSystem -Root \\azrads1003.dev.adatum.com\SetCredTest -Name SetCredTest -Credential $svcAccountCred
+	New-PSDrive -PSProvider FileSystem -Root \\azrads1003.dev.adatum.com\c$ -Name SetCredTest -Credential $svcAccountCred
 
 	A successfull result should look similar to the following output:
 
 	Name           Used (GB)     Free (GB) Provider      Root                                                                                                                                                                                           CurrentLocation
 	----           ---------     --------- --------      ----                                                                                                                                                                                           ---------------
-	SetCredTest                            FileSystem    \\<server>\SetCredTest
+	SetCredTest                            FileSystem    \\azrads1003.dev.adatum.com\c$
 
 	To test scheduling a scheduled job, us the following code snippets.
 
 	# 2.0: Register scheduled job using a script file, where F:\OneDrive\02.00.00.GENERAL\repos\git\scripts\0050\Set-CredTest.ps1 contains the code:
-    # Get-ChildItem -Path c:\ -Recurse
+    # Get-ChildItem -Path "c:\"
 
     # Register the job using the script file
     Register-ScheduledJob -Name psjob3 -FilePath {F:\OneDrive\02.00.00.GENERAL\repos\0000-scripts\0050\Set-CredTest.ps1} -Credential $svcAccountCred
@@ -44,10 +44,38 @@ This command will import the self-signed certificate if required on a machine, r
     # Add the trigger to the job
     Add-JobTrigger -Name psjob3 -Trigger $trigger1
 
-    # 2.1: Register scheduled job using a script block.
+    # After two minutes, get the job information.
 
+    PS F:\OneDrive\02.00.00.GENERAL\repos\git\0050-Set-SelfSignedCertCreds> Get-Job
+
+    Id     Name            PSJobTypeName   State         HasMoreData     Location             Command
+    --     ----            -------------   -----         -----------     --------             -------
+    1      psjob3          PSScheduledJob  Completed     True            localhost            Get-ChildItem -Path "c:\"
+
+    # Next, receive the job results
+    PS F:\OneDrive\02.00.00.GENERAL\repos\git\0050-Set-SelfSignedCertCreds> Receive-Job -Id 1 -Keep
+
+        Directory: C:\
+
+
+    Mode                LastWriteTime         Length Name
+    ----                -------------         ------ ----
+    d-----       12/24/2018   8:53 PM                inetpub
+    d-----       12/11/2018   9:36 PM                Microsoft
+    d-----       12/23/2018  10:15 PM                Packages
+    d-----       11/16/2018  12:13 AM                PerfLogs
+    d-r---       12/24/2018   8:50 PM                Program Files
+    d-----       12/24/2018   6:33 PM                Program Files (x86)
+    d-r---       12/25/2018  11:09 AM                Users
+    d-r---       12/24/2018  11:34 PM                Windows
+    d-----       12/25/2018   4:12 AM                WindowsAzure
+
+
+    PS F:\OneDrive\02.00.00.GENERAL\repos\git\0050-Set-SelfSignedCertCreds>
+
+    # 2.1: Register scheduled job using a script block
     # Register a job using a script block
-    Register-ScheduledJob -Name PSJob -ScriptBlock { Get-ChildItem -Path \\$remotNodes\c$ -Recurse } -Credential $svcAccount -Verbose
+    Register-ScheduledJob -Name PSJob -ScriptBlock { Get-ChildItem -Path \\azrads1003.dev.adatum.com\c$ } -Credential $svcAccountCred -Verbose
 
     # Create a trigger for 10 seconds from now
     $trigger = New-JobTrigger -At (Get-Date).AddSeconds(10) -Once -Verbose
@@ -57,5 +85,33 @@ This command will import the self-signed certificate if required on a machine, r
 
     # The scheduled jobs will appear at in the Task Scheduler at the path:
 	# Microsoft\Windows\PowerShell\ScheduledJobs
+
+    # Get the job information
+    PS F:\OneDrive\02.00.00.GENERAL\repos\git\0050-Set-SelfSignedCertCreds> Get-Job
+
+    Id     Name            PSJobTypeName   State         HasMoreData     Location             Command
+    --     ----            -------------   -----         -----------     --------             -------
+    2      PSJob           PSScheduledJob  Completed     True            localhost             Get-ChildItem -Path \...
+
+    # Receive the job
+    PS F:\OneDrive\02.00.00.GENERAL\repos\git\0050-Set-SelfSignedCertCreds> Receive-Job -Id 2
+
+        Directory: \\azrads1003.dev.adatum.com\c$
+
+
+    Mode                LastWriteTime         Length Name
+    ----                -------------         ------ ----
+    d-----       12/23/2018   9:43 PM                Packages
+    d-----       12/14/2018   9:32 PM                PerfLogs
+    d-r---       12/24/2018   5:55 AM                Program Files
+    d-----       11/21/2016   9:25 AM                Program Files (x86)
+    d-----       12/25/2018   9:51 AM                SetCredTest
+    d-r---       12/14/2018  10:33 PM                Users
+    d-r---       12/24/2018  12:04 AM                Windows
+    d-----       12/23/2018   9:52 PM                WindowsAzure
+
+
+    PS F:\OneDrive\02.00.00.GENERAL\repos\git\0050-Set-SelfSignedCertCreds>
+
 #>
 #endregion INTEGRATION TESTING - MANUAL
