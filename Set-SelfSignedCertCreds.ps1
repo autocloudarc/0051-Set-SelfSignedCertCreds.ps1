@@ -19,6 +19,9 @@ This way, you can log on with the same service account on another machine and im
 .PARAMETER logDirectory
 Log directory for transcript, i.e. "\\<server>\<share>\logs"
 
+.PARAMETER svcAccountName
+Service account name that will be used to execute commands and scripts in common name or sAMAccountName format, i.e. ServiceAccount, NOT ServiceAccount@domain.com 
+
 .PARAMETER ExportCert
 This is a switched parameter that when specified performs the following actions:
 1. Creates a new self-signed SSL certificate.
@@ -36,20 +39,20 @@ For this to work the following conditions must first be satisfied:
 
 .EXAMPLE
 [WITH the -ExportCert switch parameter]
-.\Set-SelfSignedCertCreds.ps1 -netDirectory "\\<server>\<share>\<directory>" -logDirectory "\\<server>\<share>\logs" -ExportCert -Verbose
-In this example, a new self-signed certificate will be created and installed. Service account credentials will be requested, and the password encrypted and exported to a file share, along with the username.
+.\Set-SelfSignedCertCreds.ps1 -netDirectory "\\<server>\<share>\<directory>" -logDirectory "\\<server>\<share>\logs" -svcAccountName <svcAccountName> -ExportCert -Verbose
+In this example, a new self-signed certificate will be created and installed. The service account password for the service account name specified will be encrypted and exported to a file share, along with the username.
 The certificate will also be exported, then removed from the current machine. The verbose switch is added to show details of certain operations.
 
 .EXAMPLE
 [WITHOUT the -ExportCert switch parameter]
-.\Set-SelfSignedCertCreds.ps1 -netDirectory "\\<server>\<share>\<directory>" -logDirectory "\\<server>\<share>\logs" -Verbose
-This command will import the self-signed certificate if required on a machine, retrieve the previously exported credentials, then use the certificate to decrypt the password component of the credential.
+.\Set-SelfSignedCertCreds.ps1 -netDirectory "\\<server>\<share>\<directory>" -logDirectory "\\<server>\<share>\logs" -svcAccountName <svcAccountName> -Verbose
+This command will import the self-signed certificate associated witht the service account name if required on a machine, retrieve the previously exported credentials, then use the certificate to decrypt the password component of the credential.
 
 .EXAMPLE
 [WITHOUT THE -ExportCert AND WITH the -SuppressPrompts switch parameter]
-.\Set-SelfSignedCertCreds.ps1 -netDirectory "\\<server>\<share>\<directory>" -logDirectory "\\<server>\<share>\logs" -SuppressPrompts -Verbose
-This command will import the self-signed certificate if required on a machine, retrieve the previously exported credentials, then use the certificate to decrypt the password component of the credential.
-In this case, all interactive prompts will be suppressed, but transcript logging will continue.
+.\Set-SelfSignedCertCreds.ps1 -netDirectory "\\<server>\<share>\<directory>" -logDirectory "\\<server>\<share>\logs" -svcAccountName <svcAccounName> -SuppressPrompts -Verbose
+This command will import the self-signed certificate if required on a machine, retrieve the previously exported credentials assoicated with the service account name specified, 
+then use the certificate to decrypt the password component of the credential. In this case, all interactive prompts will be suppressed, but transcript logging will continue.
 This switch is intended for non-interactive scenarios such as dot sourcing this script from another in order to retrieve the service account credential set for use in the main script.
 
 To test a command interactively use the following expression:
@@ -152,6 +155,12 @@ param
     [Parameter(Mandatory = $true,
         HelpMessage = "Enter the file server or local path for the transcript and custom log files.")]
     [string]$logDirectory,
+
+    # Include the service account name that will be used to execute commands or scripts
+    [Parameter(Mandatory=$true,
+        HelpMessage = "Enter the service account common or sAMAccountName, i.e. ServiceAccount WITHOUT the domain suffix.")]
+        [ValidatePattern('[^[\@]+[\w+\d+\.]+')]
+        [string]$svcAccountName,
 
     # Specifies that a new certificate will be generated, installed and used to encrypt the service account credentials.
     # The certificate and credentials will then be exported to $netDirectory into desginated files, such as pw.txt, upn.txt and PSScriptCipherCert.pfx
@@ -283,6 +292,7 @@ function Get-InitialValues
     param
     (
         [parameter(Mandatory = $true)]
+        [ValidateScript({(Get-ADUser -Identity $_)})]
         [string]$svcAccountName
     ) # end param
 
@@ -338,17 +348,19 @@ $BeginTimer = Get-Date -Verbose
 Install-AdModuleIfRequired -Verbose
 
 # Request service account username
+<#
 Write-Output "Requesting the service account username. (This will not be encrypted)"
 Do
 {
     $svcAccount = Read-Host -Prompt "Enter service account username that will be used to run powershell scripts, i.e. svc.scripts. Do not include the UPN suffix: $($(Get-ADDomain).DnsRoot)"
     Write-Output ""
 } until (Get-ADUser -Identity $svcAccount)
+#>
 
-$svcAccountUpn = $svcAccount + "@" + $(($env:USERDNSDOMAIN).ToLower())
+$svcAccountUpn = $svcAccountName + "@" + $(($env:USERDNSDOMAIN).ToLower())
 
 # Dot source the Get-InitialValues to bring the function scope values into the script scope.
-. Get-InitialValues -SvcAccountName $svcAccount
+. Get-InitialValues -SvcAccountName $svcAccountName
 
 Write-Output "`$upnFile: $upnFile"
 
