@@ -19,7 +19,8 @@ This switch is intended for non-interactive scenarios such as dot sourcing this 
 #region INTEGRATION TESTING - MANUAL
 <#
     Manual integration test suite:
-    
+    NOTE: If you are using VSCode to run this script, dot source the script so that the variables will be available in your sesssion after the script executes.
+
     # Test parameters
     # TASK-ITEM: Update these parameters with your own custom values for your environment.
     $remoteTestMachine = "azrads1003.dev.adatum.com"
