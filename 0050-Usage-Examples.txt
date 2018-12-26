@@ -59,7 +59,7 @@ NOTE: If you are using VSCode to run this script, use this expression to dot sou
 
     # Test case 4.0 Register scheduled job using a script block  
     # t4.1 Register scheduled job
-    Register-ScheduledJob -Name psjob2 -ScriptBlock { Get-ChildItem -Path $using:remoteDirectory } -Credential $svcAccountCred -Verbose
+    Register-ScheduledJob -Name psjob2 -ScriptBlock { Get-ChildItem -Path "\\azrads1003.dev.adatum.com\c$" } -Credential $svcAccountCred -Verbose
     # t4.2 Create a trigger for 10 seconds from now
     $trigger = New-JobTrigger -At (Get-Date).AddSeconds(10) -Once -Verbose
     # t4.3 Add the trigger to the job
