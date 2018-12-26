@@ -55,57 +55,58 @@ then use the certificate to decrypt the password component of the credential.
 This command will import the self-signed certificate if required on a machine, retrieve the previously exported credentials assoicated with the service account name specified, 
 then use the certificate to decrypt the password component of the credential. In this case, all interactive prompts will be suppressed, but transcript logging will continue.
 This switch is intended for non-interactive scenarios such as dot sourcing this script from another in order to retrieve the service account credential set for use in the main script.
-    Manual integration test suite:
-    
-    # Test parameters
-    # TASK-ITEM: Update these parameters with your own custom values for your environment.
-    $remoteTestMachine = "<remoteTestMachine>"
-    $scriptPath = "<scriptPath>"
-    $scriptContent = "Get-ChildItem -Path 'c:\'"
-    $remoteDirectory = "$remoteTestMachine\c$"
 
-    # Test case 1.0: To remove the currently installed certificate for re-testing the -ExportCert scenario, run the following command:
-    Get-ChildItem -Path $SelfSignedCertParams.CertStoreLocation | Where-Object { $_.Subject -match "-PSScriptCipherCert" } | Remove-Item -Force
+Manual integration test suite:
 
-	# Test case 2.0: To test a command interactively, use the following expression:
-    # tc2.1 Interactive command test
-    Invoke-Command -Computername $remoteTestMachine -ScriptBlock { Get-Childitem -Path "c:\" } -Credential $svcAccountCred
+# Test parameters
+# TASK-ITEM: Update these parameters with your own custom values for your environment.
+$remoteTestMachine = "<remoteTestMachine>"
+$scriptPath = "<scriptPath>"
+$scriptContent = "Get-ChildItem -Path 'c:\'"
+$remoteDirectory = "$remoteTestMachine\c$"
 
-	# Test case 3.0: Register scheduled job using a script file, where $scriptPath contains the code: Get-ChildItem -Path "c:\" as represented by $scriptContent
-    # tc3.1 Register the job using the script file
-    Register-ScheduledJob -Name psjob1 -FilePath { $using:scriptPath } -Credential $svcAccountCred
-    # tc3.2 Create a trigger for 10 seconds from now
-    $trigger1 = New-JobTrigger -At (Get-Date).AddSeconds(10) -Once -Verbose
-    # t3.3 Add the trigger to the job
-    Add-JobTrigger -Name psjob1 -Trigger $trigger1 -Verbose
-    # t3.4 After 15 seconds, get the job information.
-    Start-Sleep -seconds 15 -Verbose
-    Get-Job -Name psjob1 -Verbose
-    # t3.5 Retieve the results
-    Receive-Job -Name psjob1 -Keep -Verbose
-    # t3.6 The scheduled jobs will appear at in the Task Scheduler at the path: Microsoft\Windows\PowerShell\ScheduledJobs
-    # t3.7 Remove the job 
-    Get-ScheduledJob -Name psjob1 | Unregister-ScheduledJob -Verbose
+# Test case 1.0: To remove the currently installed certificate for re-testing the -ExportCert scenario, run the following command:
+Get-ChildItem -Path $SelfSignedCertParams.CertStoreLocation | Where-Object { $_.Subject -match "-PSScriptCipherCert" } | Remove-Item -Force
 
-    # Test case 4.0 Register scheduled job using a script block  
-    # t4.1 Register scheduled job
-    Register-ScheduledJob -Name PSJob2 -ScriptBlock { Get-ChildItem -Path $using:remoteDirectory } -Credential $svcAccountCred -Verbose
-    # t4.2 Create a trigger for 10 seconds from now
-    $trigger = New-JobTrigger -At (Get-Date).AddSeconds(10) -Once -Verbose
-    # t4.3 Add the trigger to the job
-    Add-JobTrigger -Name PSJob2 -Trigger $trigger -Verbose
-    # t4.4 After 15 seconds, get the job information.
-    Start-Sleep -seconds 15 -Verbose
-    Get-Job -Name psjob2 -Verbose
-    # t4.5 Retieve the results
-    Receive-Job -Name PSJob2 -Keep -Verbose
-    # t3.6 The scheduled jobs will appear at in the Task Scheduler at the path: Microsoft\Windows\PowerShell\ScheduledJobs
-    # t4.6 Remove the job 
-    Get-ScheduledJob -Name psjob2 | Unregister-ScheduledJob -Verbose
+# Test case 2.0: To test a command interactively, use the following expression:
+# tc2.1 Interactive command test
+Invoke-Command -Computername $remoteTestMachine -ScriptBlock { Get-Childitem -Path "c:\" } -Credential $svcAccountCred
 
-    # c1.0 Cleanup and reset test environment. Verify that all jobs have been removed to prepare for subsequent testing.
-    # c1.1 Show scheduled jobs if available 
-    Get-ScheduledJob -ErrorAction "SilentlyContinue" -Verbose
+# Test case 3.0: Register scheduled job using a script file, where $scriptPath contains the code: Get-ChildItem -Path "c:\" as represented by $scriptContent
+# tc3.1 Register the job using the script file
+Register-ScheduledJob -Name psjob1 -FilePath { $using:scriptPath } -Credential $svcAccountCred
+# tc3.2 Create a trigger for 10 seconds from now
+$trigger1 = New-JobTrigger -At (Get-Date).AddSeconds(10) -Once -Verbose
+# t3.3 Add the trigger to the job
+Add-JobTrigger -Name psjob1 -Trigger $trigger1 -Verbose
+# t3.4 After 15 seconds, get the job information.
+Start-Sleep -seconds 15 -Verbose
+Get-Job -Name psjob1 -Verbose
+# t3.5 Retieve the results
+Receive-Job -Name psjob1 -Keep -Verbose
+# t3.6 The scheduled jobs will appear at in the Task Scheduler at the path: Microsoft\Windows\PowerShell\ScheduledJobs
+# t3.7 Remove the job 
+Get-ScheduledJob -Name psjob1 | Unregister-ScheduledJob -Verbose
+
+# Test case 4.0 Register scheduled job using a script block  
+# t4.1 Register scheduled job
+Register-ScheduledJob -Name PSJob2 -ScriptBlock { Get-ChildItem -Path $using:remoteDirectory } -Credential $svcAccountCred -Verbose
+# t4.2 Create a trigger for 10 seconds from now
+$trigger = New-JobTrigger -At (Get-Date).AddSeconds(10) -Once -Verbose
+# t4.3 Add the trigger to the job
+Add-JobTrigger -Name PSJob2 -Trigger $trigger -Verbose
+# t4.4 After 15 seconds, get the job information.
+Start-Sleep -seconds 15 -Verbose
+Get-Job -Name psjob2 -Verbose
+# t4.5 Retieve the results
+Receive-Job -Name PSJob2 -Keep -Verbose
+# t3.6 The scheduled jobs will appear at in the Task Scheduler at the path: Microsoft\Windows\PowerShell\ScheduledJobs
+# t4.6 Remove the job 
+Get-ScheduledJob -Name psjob2 | Unregister-ScheduledJob -Verbose
+
+# c1.0 Cleanup and reset test environment. Verify that all jobs have been removed to prepare for subsequent testing.
+# c1.1 Show scheduled jobs if available 
+Get-ScheduledJob -ErrorAction "SilentlyContinue" -Verbose
 
 .INPUTS
 None
