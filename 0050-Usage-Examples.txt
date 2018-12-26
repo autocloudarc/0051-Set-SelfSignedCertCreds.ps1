@@ -1,18 +1,19 @@
 .EXAMPLE
 [WITH the -ExportCert switch parameter]
-.\Set-SelfSignedCertCreds.ps1 -netDirectory "\\azrfil1001.dev.adatum.com\CertEncryption" -logDirectory "\\azrfil1001.dev.adatum.com\logs" -ExportCert -Verbose
-In this example, a new self-signed certificate will be created and installed. Service account credentials will be requested and the password encrypted and exported to a file share, along with the username.
+.\Set-SelfSignedCertCreds.ps1 -netDirectory "\\azrfil1001.dev.adatum.com\CertEncryption" -logDirectory "\\azrfil1001.dev.adatum.com\logs" -svcAccountName "svc.ps.script" -ExportCert -Verbose
+In this example, a new self-signed certificate will be created and installed. The service account password for the service account name specified will be encrypted and exported to a file share, along with the username.
 The certificate will also be exported, then removed from the current machine. The verbose switch is added to show details of certain operations.
 
 .EXAMPLE
 [WITHOUT the -ExportCert switch parameter]
-.\Set-SelfSignedCertCreds.ps1 -netDirectory "\\azrfil1001.dev.adatum.com\CertEncryption" -logDirectory "\\azrfil1001.dev.adatum.com\logs" -Verbose
-This command will import the self-signed certificate if required on a machine, retrieve the previously exported credentials, then use the certificate to decrypt the password component of the credential.
+This command will import the self-signed certificate associated witht the service account name if required on a machine, retrieve the previously exported credentials, 
+then use the certificate to decrypt the password component of the credential.
 
 .EXAMPLE
-[WITHOUT the -ExportCert switch parameter and USING the -SuppressPrompts switch]
-.\Set-SelfSignedCertCreds.ps1 -netDirectory "\\azrfil1001.dev.adatum.com\CertEncryption" -logDirectory "\\azrfil1001.dev.adatum.com\logs" -SuppressPrompts -Verbose
-This command will import the self-signed certificate if required on a machine, retrieve the previously exported credentials, then use the certificate to decrypt the password component of the credential.
+.\Set-SelfSignedCertCreds.ps1 -netDirectory "\\<server>\<share>\<directory>" -logDirectory "\\<server>\<share>\logs" -svcAccountName <svcAccounName> -SuppressPrompts -Verbose
+This command will import the self-signed certificate if required on a machine, retrieve the previously exported credentials assoicated with the service account name specified, 
+then use the certificate to decrypt the password component of the credential. In this case, all interactive prompts will be suppressed, but transcript logging will continue.
+This switch is intended for non-interactive scenarios such as dot sourcing this script from another in order to retrieve the service account credential set for use in the main script.
 
 #region INTEGRATION TESTING - MANUAL
 <#
