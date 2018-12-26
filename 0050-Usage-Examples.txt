@@ -4,7 +4,7 @@
 In this example, a new self-signed certificate will be created and installed. The service account password for the service account name specified will be encrypted and exported to a file share, along with the username.
 The certificate will also be exported, then removed from the current machine. The verbose switch is added to show details of certain operations.
 NOTE: If you are using VSCode to run this script, use this expression to dot source the script so that the variables will be available in your sesssion after the script executes.
-. .\Set-SelfSignedCertCreds.ps1 -netDirectory "\\<server>\<share>\<directory>" -logDirectory "\\<server>\<share>\logs" -svcAccountName <svcAccountName> -Verbose
+. .\Set-SelfSignedCertCreds.ps1 -netDirectory "\\azrfil1001.dev.adatum.com\CertEncryption" -logDirectory "\\azrfil1001.dev.adatum.com\logs" -svcAccountName "svc.ps.script" -ExportCert -Verbose
 
 .EXAMPLE
 [WITHOUT the -ExportCert switch parameter]
@@ -12,7 +12,7 @@ NOTE: If you are using VSCode to run this script, use this expression to dot sou
 This command will import the self-signed certificate associated witht the service account name if required on a machine, retrieve the previously exported credentials, 
 then use the certificate to decrypt the password component of the credential.
 NOTE: If you are using VSCode to run this script, use this expression to dot source the script so that the variables will be available in your sesssion after the script executes.
-. .\Set-SelfSignedCertCreds.ps1 -netDirectory "\\<server>\<share>\<directory>" -logDirectory "\\<server>\<share>\logs" -svcAccountName <svcAccountName> -Verbose
+. .\Set-SelfSignedCertCreds.ps1 -netDirectory "\\azrfil1001.dev.adatum.com\CertEncryption" -logDirectory "\\azrfil1001.dev.adatum.com\logs" -svcAccountName "svc.ps.script" -Verbose
 
 .EXAMPLE
 .\Set-SelfSignedCertCreds.ps1 -netDirectory "\\azrfil1001.dev.adatum.com\CertEncryption" -logDirectory "\\azrfil1001.dev.adatum.com\logs" -svcAccountName "svc.ps.script" -SuppressPrompts -Verbose
@@ -20,7 +20,7 @@ This command will import the self-signed certificate if required on a machine, r
 then use the certificate to decrypt the password component of the credential. In this case, all interactive prompts will be suppressed, but transcript logging will continue.
 This switch is intended for non-interactive scenarios such as dot sourcing this script from another in order to retrieve the service account credential set for use in the main script.
 NOTE: If you are using VSCode to run this script, use this expression to dot source the script so that the variables will be available in your sesssion after the script executes.
-. .\Set-SelfSignedCertCreds.ps1 -netDirectory "\\<server>\<share>\<directory>" -logDirectory "\\<server>\<share>\logs" -svcAccountName <svcAccountName> -Verbose
+. .\Set-SelfSignedCertCreds.ps1 -netDirectory "\\azrfil1001.dev.adatum.com\CertEncryption" -logDirectory "\\azrfil1001.dev.adatum.com\logs" -svcAccountName "svc.ps.script" -SuppressPrompts -Verbose
 
 #region INTEGRATION TESTING - MANUAL
 <#
@@ -30,7 +30,6 @@ NOTE: If you are using VSCode to run this script, use this expression to dot sou
     # Test parameters
     # TASK-ITEM: Update these parameters with your own custom values for your environment.
     $remoteTestMachine = "azrads1003.dev.adatum.com"
-    $scriptPath = "F:\OneDrive\02.00.00.GENERAL\repos\git\scripts\0050\Set-CredTest.ps1"
     $scriptContent = "Get-ChildItem -Path 'c:\'"
     $remoteDirectory = "$remoteTestMachine\c$"
 
@@ -41,9 +40,9 @@ NOTE: If you are using VSCode to run this script, use this expression to dot sou
     # tc2.1 Interactive command test
     Invoke-Command -Computername $remoteTestMachine -ScriptBlock { Get-Childitem -Path "c:\" } -Credential $svcAccountCred
 
-	# Test case 3.0: Register scheduled job using a script file, where $scriptPath contains the code: Get-ChildItem -Path "c:\" as represented by $scriptContent
+	# Test case 3.0: Register scheduled job using a script file, which contains the code: Get-ChildItem -Path "c:\" 
     # tc3.1 Register the job using the script file
-    Register-ScheduledJob -Name psjob1 -FilePath { $using:scriptPath } -Credential $svcAccountCred
+    Register-ScheduledJob -Name psjob1 -FilePath { "F:\OneDrive\02.00.00.GENERAL\repos\git\scripts\0050\Set-CredTest.ps1" } -Credential $svcAccountCred
     # tc3.2 Create a trigger for 10 seconds from now
     $trigger1 = New-JobTrigger -At (Get-Date).AddSeconds(10) -Once -Verbose
     # t3.3 Add the trigger to the job
