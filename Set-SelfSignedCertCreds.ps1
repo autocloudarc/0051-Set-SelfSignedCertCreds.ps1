@@ -42,6 +42,8 @@ For this to work the following conditions must first be satisfied:
 .\Set-SelfSignedCertCreds.ps1 -netDirectory "\\<server>\<share>\<directory>" -logDirectory "\\<server>\<share>\logs" -svcAccountName <svcAccountName> -ExportCert -Verbose
 In this example, a new self-signed certificate will be created and installed. The service account password for the service account name specified will be encrypted and exported to a file share, along with the username.
 The certificate will also be exported, then removed from the current machine. The verbose switch is added to show details of certain operations.
+NOTE: If you are using VSCode to run this script, use this expression to dot source the script so that the variables will be available in your sesssion after the script executes.
+. .\Set-SelfSignedCertCreds.ps1 -netDirectory "\\<server>\<share>\<directory>" -logDirectory "\\<server>\<share>\logs" -svcAccountName <svcAccountName> -Verbose
 
 .EXAMPLE
 [WITHOUT the -ExportCert switch parameter]
