@@ -67,7 +67,6 @@ Manual integration test suite:
 # Test parameters
 # TASK-ITEM: Update these parameters with your own custom values for your environment.
 $remoteTestMachine = "<remoteTestMachine>"
-$scriptPath = "<scriptPath>"
 $scriptContent = "Get-ChildItem -Path 'c:\'"
 $remoteDirectory = "$remoteTestMachine\c$"
 
@@ -78,9 +77,9 @@ Get-ChildItem -Path $SelfSignedCertParams.CertStoreLocation | Where-Object { $_.
 # tc2.1 Interactive command test
 Invoke-Command -Computername $remoteTestMachine -ScriptBlock { Get-Childitem -Path "c:\" } -Credential $svcAccountCred
 
-# Test case 3.0: Register scheduled job using a script file, where $scriptPath contains the code: Get-ChildItem -Path "c:\" as represented by $scriptContent
+# Test case 3.0: Register scheduled job using a script file, which contains the code: Get-ChildItem -Path "c:\"
 # tc3.1 Register the job using the script file
-Register-ScheduledJob -Name psjob1 -FilePath { $using:scriptPath } -Credential $svcAccountCred
+Register-ScheduledJob -Name psjob1 -FilePath { "<scriptPath>" } -Credential $svcAccountCred
 # tc3.2 Create a trigger for 10 seconds from now
 $trigger1 = New-JobTrigger -At (Get-Date).AddSeconds(10) -Once -Verbose
 # t3.3 Add the trigger to the job
