@@ -46,7 +46,8 @@ The certificate will also be exported, then removed from the current machine. Th
 .EXAMPLE
 [WITHOUT the -ExportCert switch parameter]
 .\Set-SelfSignedCertCreds.ps1 -netDirectory "\\<server>\<share>\<directory>" -logDirectory "\\<server>\<share>\logs" -svcAccountName <svcAccountName> -Verbose
-This command will import the self-signed certificate associated witht the service account name if required on a machine, retrieve the previously exported credentials, then use the certificate to decrypt the password component of the credential.
+This command will import the self-signed certificate associated witht the service account name if required on a machine, retrieve the previously exported credentials, 
+then use the certificate to decrypt the password component of the credential.
 
 .EXAMPLE
 [WITHOUT THE -ExportCert AND WITH the -SuppressPrompts switch parameter]
@@ -93,7 +94,6 @@ None
 .OUTPUTS
 The outputs generated from this script includes:
 1. A transcript log file to provide the full details of script execution. It will use the name format: Set-SecureCredentials-TRANSCRIPT-<Date-Time>.log
-2. A custom log file with the name format: Set-SecureCredentials-LOG-$env:COMPUTERNAME-<Date-Time>.log
 
 .NOTES
 The MIT License (MIT)
@@ -151,9 +151,9 @@ param
     [ValidateScript( {Test-Path -Path $_ })]
     [string]$netDirectory,
 
-    # Log directory for transcript and custom logs, i.e. "\\server\share\logs"
+    # Log directory for transcript logs, i.e. "\\server\share\logs"
     [Parameter(Mandatory = $true,
-        HelpMessage = "Enter the file server or local path for the transcript and custom log files.")]
+        HelpMessage = "Enter the file server or local path for the transcript log files.")]
     [string]$logDirectory,
 
     # Include the service account name that will be used to execute commands or scripts
@@ -241,7 +241,7 @@ function New-PromptObjects
     # PROMPTS (PromptsObj)
     $script:PromptsObj = [PSCustomObject]@{
         pVerifySummary = "Is this information correct? [YES/NO]"
-        pAskToOpenLogs = "Would you like to open the custom and transcript logs now ? [YES/NO]"
+        pAskToOpenLogs = "Would you like to open the transcript log now ? [YES/NO]"
     } #end $PromptsObj
 
     # Create and populate responses object with property-value pairs
@@ -331,7 +331,7 @@ $scriptName = $MyInvocation.MyCommand.name
 # Use script filename without exension as a log prefix
 $LogPrefix = $scriptName.Split(".")[0]
 
-# funciton: Create log files for custom logging and transcript
+# funciton: Create log files for transcript
 New-LogFiles -LogDirectory $LogDirectory -LogPrefix $LogPrefix -Verbose
 
 Start-Transcript -Path $Transcript -IncludeInvocationHeader -Verbose
