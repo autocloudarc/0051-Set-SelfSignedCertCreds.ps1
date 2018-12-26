@@ -69,7 +69,6 @@ Manual integration test suite:
 $remoteTestMachine = "<remoteTestMachine>"
 $scriptPath = "<scriptPath>"
 $scriptContent = "Get-ChildItem -Path 'c:\'"
-$remoteDirectory = "\\$remoteTestMachine\c$"
 
 # Test case 1.0: To remove the currently installed certificate for re-testing the -ExportCert scenario, run the following command:
 Get-ChildItem -Path $SelfSignedCertParams.CertStoreLocation | Where-Object { $_.Subject -match "-PSScriptCipherCert" } | Remove-Item -Force
@@ -78,16 +77,16 @@ Get-ChildItem -Path $SelfSignedCertParams.CertStoreLocation | Where-Object { $_.
 # tc2.1 Interactive command test
 Invoke-Command -Computername $remoteTestMachine -ScriptBlock { Get-Childitem -Path "c:\" } -Credential $svcAccountCred
 
-# Test case 3.0: Register scheduled job using a script file, which contains the code: Get-ChildItem -Path "c:\"
+# Test case 3.0: Register scheduled job using a script file, which contains the code: Get-ChildItem -Path "c:\" 
 # tc3.1 Register the job using the script file
-Register-ScheduledJob -Name psjob1 -FilePath "<scriptPath>" -Credential $svcAccountCred
+Register-ScheduledJob -Name psjob1 -FilePath $scriptPath -Credential $svcAccountCred
 # tc3.2 Create a trigger for 10 seconds from now
 $trigger1 = New-JobTrigger -At (Get-Date).AddSeconds(10) -Once -Verbose
 # t3.3 Add the trigger to the job
 Add-JobTrigger -Name psjob1 -Trigger $trigger1 -Verbose
-# t3.4 After 15 seconds, get the job information.
-Start-Sleep -seconds 15 -Verbose
-Get-Job -Name psjob1 -Verbose
+# t3.4 After 20 seconds, get the job information.
+Start-Sleep -seconds 20 -Verbose
+Get-ScheduledJob -Name psjob1 -Verbose
 # t3.5 Retieve the results
 Receive-Job -Name psjob1 -Keep -Verbose
 # t3.6 The scheduled jobs will appear at in the Task Scheduler at the path: Microsoft\Windows\PowerShell\ScheduledJobs
@@ -96,16 +95,16 @@ Get-ScheduledJob -Name psjob1 | Unregister-ScheduledJob -Verbose
 
 # Test case 4.0 Register scheduled job using a script block  
 # t4.1 Register scheduled job
-Register-ScheduledJob -Name PSJob2 -ScriptBlock { Get-ChildItem -Path $using:remoteDirectory } -Credential $svcAccountCred -Verbose
+Register-ScheduledJob -Name psjob2 -ScriptBlock { Get-ChildItem -Path "\\azrads1003.dev.adatum.com\c$" } -Credential $svcAccountCred -Verbose
 # t4.2 Create a trigger for 10 seconds from now
 $trigger = New-JobTrigger -At (Get-Date).AddSeconds(10) -Once -Verbose
 # t4.3 Add the trigger to the job
-Add-JobTrigger -Name PSJob2 -Trigger $trigger -Verbose
-# t4.4 After 15 seconds, get the job information.
-Start-Sleep -seconds 15 -Verbose
-Get-Job -Name psjob2 -Verbose
+Add-JobTrigger -Name psjob2 -Trigger $trigger -Verbose
+# t4.4 After 20 seconds, get the job information.
+Start-Sleep -seconds 20 -Verbose
+Get-ScheduledJob -Name psjob2 -Verbose
 # t4.5 Retieve the results
-Receive-Job -Name PSJob2 -Keep -Verbose
+Receive-Job -Name psjob2 -Keep -Verbose
 # t3.6 The scheduled jobs will appear at in the Task Scheduler at the path: Microsoft\Windows\PowerShell\ScheduledJobs
 # t4.6 Remove the job 
 Get-ScheduledJob -Name psjob2 | Unregister-ScheduledJob -Verbose
