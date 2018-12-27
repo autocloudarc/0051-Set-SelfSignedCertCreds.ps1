@@ -42,7 +42,7 @@ For this to work the following conditions must first be satisfied:
 .\Set-SelfSignedCertCreds.ps1 -netDirectory "\\<server>\<share>\<directory>" -logDirectory "\\<server>\<share>\logs" -svcAccountName <svcAccountName> -ExportCert -Verbose
 In this example, a new self-signed certificate will be created and installed. The service account password for the service account name specified will be encrypted and exported to a file share, along with the username.
 The certificate will also be exported, then removed from the current machine. The verbose switch is added to show details of certain operations.
-NOTE: If you are using VSCode to run this script, use this expression to dot source the script so that the variables will be available in your sesssion after the script executes.
+NOTE: If you are using VSCode to run this script, use this expression to dot source the script so that the variables will be available in your session after the script executes.
 . .\Set-SelfSignedCertCreds.ps1 -netDirectory "\\<server>\<share>\<directory>" -logDirectory "\\<server>\<share>\logs" -svcAccountName <svcAccountName> -Verbose
 
 .EXAMPLE
@@ -50,7 +50,7 @@ NOTE: If you are using VSCode to run this script, use this expression to dot sou
 .\Set-SelfSignedCertCreds.ps1 -netDirectory "\\<server>\<share>\<directory>" -logDirectory "\\<server>\<share>\logs" -svcAccountName <svcAccountName> -Verbose
 This command will import the self-signed certificate associated witht the service account name if required on a machine, retrieve the previously exported credentials, 
 then use the certificate to decrypt the password component of the credential.
-NOTE: If you are using VSCode to run this script, use this expression to dot source the script so that the variables will be available in your sesssion after the script executes.
+NOTE: If you are using VSCode to run this script, use this expression to dot source the script so that the variables will be available in your session after the script executes.
 . .\Set-SelfSignedCertCreds.ps1 -netDirectory "\\<server>\<share>\<directory>" -logDirectory "\\<server>\<share>\logs" -svcAccountName <svcAccountName> -Verbose
 
 .EXAMPLE
@@ -59,7 +59,7 @@ NOTE: If you are using VSCode to run this script, use this expression to dot sou
 This command will import the self-signed certificate if required on a machine, retrieve the previously exported credentials assoicated with the service account name specified, 
 then use the certificate to decrypt the password component of the credential. In this case, all interactive prompts will be suppressed, but transcript logging will continue.
 This switch is intended for non-interactive scenarios such as dot sourcing this script from another in order to retrieve the service account credential set for use in the main script.
-NOTE: If you are using VSCode to run this script, use this expression to dot source the script so that the variables will be available in your sesssion after the script executes.
+NOTE: If you are using VSCode to run this script, use this expression to dot source the script so that the variables will be available in your session after the script executes.
 . .\Set-SelfSignedCertCreds.ps1 -netDirectory "\\<server>\<share>\<directory>" -logDirectory "\\<server>\<share>\logs" -svcAccountName <svcAccountName> -Verbose
 
 Manual integration test suite:
