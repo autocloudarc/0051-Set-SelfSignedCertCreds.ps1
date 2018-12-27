@@ -70,48 +70,49 @@ $remoteTestMachine = "<remoteTestMachine>"
 $scriptPath = "<scriptPath>"
 $scriptContent = "Get-ChildItem -Path 'c:\'"
 
-# Test case 1.0: To remove the currently installed certificate for re-testing the -ExportCert scenario, run the following command:
-Get-ChildItem -Path $SelfSignedCertParams.CertStoreLocation | Where-Object { $_.Subject -match "-PSScriptCipherCert" } | Remove-Item -Force
-
-# Test case 2.0: To test a command interactively, use the following expression:
-# tc2.1 Interactive command test
+# Test case 1.0: To test a command interactively, use the following expression:
+# tc1.1 Interactive command test
 Invoke-Command -Computername $remoteTestMachine -ScriptBlock { Get-Childitem -Path "c:\" } -Credential $svcAccountCred
 
-# Test case 3.0: Register scheduled job using a script file, which contains the code: Get-ChildItem -Path "c:\" 
-# tc3.1 Register the job using the script file
+# Test case 2.0: Register scheduled job using a script file, which contains the code: Get-ChildItem -Path "c:\" 
+# tc2.1 Register the job using the script file
 Register-ScheduledJob -Name psjob1 -FilePath $scriptPath -Credential $svcAccountCred
-# tc3.2 Create a trigger for 10 seconds from now
+# tc2.2 Create a trigger for 10 seconds from now
 $trigger1 = New-JobTrigger -At (Get-Date).AddSeconds(10) -Once -Verbose
-# t3.3 Add the trigger to the job
+# t2.3 Add the trigger to the job
 Add-JobTrigger -Name psjob1 -Trigger $trigger1 -Verbose
-# t3.4 After 20 seconds, get the job information.
+# t2.4 After 20 seconds, get the job information.
 Start-Sleep -seconds 20 -Verbose
 Get-ScheduledJob -Name psjob1 -Verbose
-# t3.5 Retieve the results
+# t2.5 Retieve the results
 Receive-Job -Name psjob1 -Keep -Verbose
-# t3.6 The scheduled jobs will appear at in the Task Scheduler at the path: Microsoft\Windows\PowerShell\ScheduledJobs
-# t3.7 Remove the job 
+# t2.6 The scheduled jobs will appear at in the Task Scheduler at the path: Microsoft\Windows\PowerShell\ScheduledJobs
+# t2.7 Remove the job 
 Get-ScheduledJob -Name psjob1 | Unregister-ScheduledJob -Verbose
 
-# Test case 4.0 Register scheduled job using a script block  
-# t4.1 Register scheduled job
+# Test case 3.0: Register scheduled job using a script block  
+# t3.1 Register scheduled job
 Register-ScheduledJob -Name psjob2 -ScriptBlock { Get-ChildItem -Path "\\azrads1003.dev.adatum.com\c$" } -Credential $svcAccountCred -Verbose
-# t4.2 Create a trigger for 10 seconds from now
+# t3.2 Create a trigger for 10 seconds from now
 $trigger = New-JobTrigger -At (Get-Date).AddSeconds(10) -Once -Verbose
-# t4.3 Add the trigger to the job
+# t3.3 Add the trigger to the job
 Add-JobTrigger -Name psjob2 -Trigger $trigger -Verbose
-# t4.4 After 20 seconds, get the job information.
+# t3.4 After 20 seconds, get the job information.
 Start-Sleep -seconds 20 -Verbose
 Get-ScheduledJob -Name psjob2 -Verbose
-# t4.5 Retieve the results
+# t3.5 Retieve the results
 Receive-Job -Name psjob2 -Keep -Verbose
 # t3.6 The scheduled jobs will appear at in the Task Scheduler at the path: Microsoft\Windows\PowerShell\ScheduledJobs
-# t4.6 Remove the job 
+# t3.6 Remove the job 
 Get-ScheduledJob -Name psjob2 | Unregister-ScheduledJob -Verbose
 
 # c1.0 Cleanup and reset test environment. Verify that all jobs have been removed to prepare for subsequent testing.
 # c1.1 Show scheduled jobs if available 
 Get-ScheduledJob -ErrorAction "SilentlyContinue" -Verbose
+
+# c2.0 To remove the currently installed certificate for re-testing the -ExportCert scenario, run the following command:
+# c2.1 Remove install self-signed certificates
+Get-ChildItem -Path $SelfSignedCertParams.CertStoreLocation | Where-Object { $_.Subject -match "-PSScriptCipherCert" } | Remove-Item -Force
 
 .INPUTS
 None
@@ -294,9 +295,8 @@ function Get-SvcAccountCredential
     # Retrieve the installed certificate
     $importedCert = Get-ChildItem -Path $SelfSignedCertParams.CertStoreLocation | Where-Object {$_.Subject -match "$($SelfSignedCertParams.Subject)"}
     $EncryptedPwd = Get-Content -Path $pwFilePath
-    $EncryptedBytes = [System.Convert]::FromBase64String($EncryptedPwd)
-    $DecryptedBytes = $importedCert.PrivateKey.Decrypt($EncryptedBytes, $true)
-    $DecryptedPwd = [system.text.encoding]::UTF8.GetString($DecryptedBytes)
+    # Decrypt password
+    $DecryptedPwd = $EncryptedPwd | Unprotect-CmsMessage -To $certCn
     return $DecryptedPwd
 } # end function
 function Get-PrivateKeyCredentials
@@ -321,16 +321,22 @@ function Get-InitialValues
         [string]$svcAccountName
     ) # end param
 
-    $SelfSignedCertParams =
+    # Create parameters for document encryption certificate
+    $SelfSignedCertParams = 
     @{
         KeyDescription    = "PowerShell Script Encryption-Decryption Key"
         Provider          = "Microsoft Enhanced RSA and AES Cryptographic Provider"
         KeyFriendlyName   = "PSScriptEncryptDecryptKey"
         FriendlyName      = "$svcAccountName-PSScriptCipherCert"
         Subject           = "$svcAccountName-PSScriptCipherCert"
+        KeyUsage          = "DataEncipherment"
+        Type              = "DocumentEncryptionCert"
         HashAlgorithm     = "sha256"
         CertStoreLocation = "Cert:\CurrentUser\My"
     } # end params
+
+    # Convert certificate subject to cn= format.
+    $certCn =  "cn=$($SelfSignedCertParams.Subject)"
 
     $pwFile = "$svcAccountName-pw.txt"
     $upnFile = "$svcAccountName-upn.txt"
@@ -497,9 +503,9 @@ else
         Write-output "Encrypting service account password." 
         $svcAccountName = $cred.GetNetworkCredential().UserName
         $svcAccountPassword = $cred.GetNetworkCredential().Password
-        $EncodedPwd = [System.Text.Encoding]::UTF8.GetBytes($svcAccountPassword)
-        $EncryptedBytes = $exportedCert.PublicKey.Key.Encrypt($EncodedPwd, $true)
-        $EncryptedPwd = [System.Convert]::ToBase64String($EncryptedBytes)
+
+        # Encrypt password
+        $EncryptedPwd = $svcAccountPassword | Protect-CmsMessage -To $certCn
 
         # Write service account username to UPN file
         Write-output "Exporting service account username: $svcAccountName to $upnFilePath." 
@@ -615,49 +621,3 @@ If (-not($SuppressPrompts))
 #endregion SUMMARY
 
 Stop-Transcript -ErrorAction SilentlyContinue -Verbose
-
-#region INTEGRATION TESTING - MANUAL
-<#
-    Manual integration testing:
-    
-    To remove the currently installed certificate for re-testing the -ExportCert scenario, run the following command:
-    Get-ChildItem -Path cert:\currentuser\my | Where-Object { $_.Subject -match "-PSScriptCipherCert" } | Remove-Item -Force
-
-	To test a command interactively use the following expression:
-	New-PSDrive -PSProvider FileSystem -Root \\<servername>\SetCredTest -Name SetCredTest -Credential $svcAccountCred
-
-	A successfull result should look similar to the following output:
-
-	Name           Used (GB)     Free (GB) Provider      Root                                                                                                                                                                                           CurrentLocation
-	----           ---------     --------- --------      ----                                                                                                                                                                                           ---------------
-	SetCredTest                            FileSystem    \\<server>\SetCredTest
-
-	To test scheduling a scheduled job, us the following code snippets.
-
-	# 2.0: Register scheduled job using a script file, where c:\scripts\Set-CredTest.ps1 contains the code:
-    # Get-ChildItem -Path c:\ -Recurse
-
-    # Register the job using the script file
-    Register-ScheduledJob -Name psjob3 -FilePath {c:\scripts\Set-CredTest.ps1} -Credential $svcAccountCred
-
-    # Create a trigger for two minutes from now
-    $trigger1 = New-JobTrigger -At (Get-Date).AddMinutes(2) -Once
-
-    # Add the trigger to the job
-    Add-JobTrigger -Name psjob3 -Trigger $trigger1
-
-    # 2.1: Register scheduled job using a script block.
-
-    # Register a job using a script block
-    Register-ScheduledJob -Name PSJob -ScriptBlock { Get-ChildItem -Path \\$remotNodes\c$ -Recurse } -Credential $svcAccount -Verbose
-
-    # Create a trigger for 10 seconds from now
-    $trigger = New-JobTrigger -At (Get-Date).AddSeconds(10) -Once -Verbose
-
-    # Add the trigger to the job
-    Add-JobTrigger -Name PSJob -Trigger $trigger -Verbose
-
-    # The scheduled jobs will appear at in the Task Scheduler at the path:
-	# Microsoft\Windows\PowerShell\ScheduledJobs
-#>
-#endregion INTEGRATION TESTING - MANUAL
