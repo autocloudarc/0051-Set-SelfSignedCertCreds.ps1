@@ -33,47 +33,48 @@ NOTE: If you are using VSCode to run this script, use this expression to dot sou
     $scriptContent = "Get-ChildItem -Path 'c:\'"
     $scriptPath = "F:\OneDrive\02.00.00.GENERAL\repos\0000-scripts\0050\Set-CredTest.ps1"
 
-    # Test case 1.0: To remove the currently installed certificate for re-testing the -ExportCert scenario, run the following command:
-    Get-ChildItem -Path $SelfSignedCertParams.CertStoreLocation | Where-Object { $_.Subject -match "-PSScriptCipherCert" } | Remove-Item -Force
-
-	# Test case 2.0: To test a command interactively, use the following expression:
-    # tc2.1 Interactive command test
+	# Test case 1.0: To test a command interactively, use the following expression:
+    # tc1.1 Interactive command test
     Invoke-Command -Computername $remoteTestMachine -ScriptBlock { Get-Childitem -Path "c:\" } -Credential $svcAccountCred
 
-	# Test case 3.0: Register scheduled job using a script file, which contains the code: Get-ChildItem -Path "c:\" 
-    # tc3.1 Register the job using the script file
+	# Test case 2.0: Register scheduled job using a script file, which contains the code: Get-ChildItem -Path "c:\" 
+    # tc2.1 Register the job using the script file
     Register-ScheduledJob -Name psjob1 -FilePath $scriptPath -Credential $svcAccountCred
-    # tc3.2 Create a trigger for 10 seconds from now
+    # tc2.2 Create a trigger for 10 seconds from now
     $trigger1 = New-JobTrigger -At (Get-Date).AddSeconds(10) -Once -Verbose
-    # t3.3 Add the trigger to the job
+    # t2.3 Add the trigger to the job
     Add-JobTrigger -Name psjob1 -Trigger $trigger1 -Verbose
-    # t3.4 After 20 seconds, get the job information.
+    # t2.4 After 20 seconds, get the job information.
     Start-Sleep -seconds 20 -Verbose
     Get-ScheduledJob -Name psjob1 -Verbose
-    # t3.5 Retieve the results
+    # t2.5 Retieve the results
     Receive-Job -Name psjob1 -Keep -Verbose
-    # t3.6 The scheduled jobs will appear at in the Task Scheduler at the path: Microsoft\Windows\PowerShell\ScheduledJobs
-    # t3.7 Remove the job 
+    # t2.6 The scheduled jobs will appear at in the Task Scheduler at the path: Microsoft\Windows\PowerShell\ScheduledJobs
+    # t2.7 Remove the job 
     Get-ScheduledJob -Name psjob1 | Unregister-ScheduledJob -Verbose
 
-    # Test case 4.0 Register scheduled job using a script block  
-    # t4.1 Register scheduled job
+    # Test case 3.0: Register scheduled job using a script block  
+    # t3.1 Register scheduled job
     Register-ScheduledJob -Name psjob2 -ScriptBlock { Get-ChildItem -Path "\\azrads1003.dev.adatum.com\c$" } -Credential $svcAccountCred -Verbose
-    # t4.2 Create a trigger for 10 seconds from now
+    # t3.2 Create a trigger for 10 seconds from now
     $trigger = New-JobTrigger -At (Get-Date).AddSeconds(10) -Once -Verbose
-    # t4.3 Add the trigger to the job
+    # t3.3 Add the trigger to the job
     Add-JobTrigger -Name psjob2 -Trigger $trigger -Verbose
-    # t4.4 After 20 seconds, get the job information.
+    # t3.4 After 20 seconds, get the job information.
     Start-Sleep -seconds 20 -Verbose
     Get-ScheduledJob -Name psjob2 -Verbose
-    # t4.5 Retieve the results
+    # t3.5 Retieve the results
     Receive-Job -Name psjob2 -Keep -Verbose
     # t3.6 The scheduled jobs will appear at in the Task Scheduler at the path: Microsoft\Windows\PowerShell\ScheduledJobs
-    # t4.6 Remove the job 
+    # t3.6 Remove the job 
     Get-ScheduledJob -Name psjob2 | Unregister-ScheduledJob -Verbose
 
     # c1.0 Cleanup and reset test environment. Verify that all jobs have been removed to prepare for subsequent testing.
     # c1.1 Show scheduled jobs if available 
     Get-ScheduledJob -ErrorAction "SilentlyContinue" -Verbose
+    
+    # c2.0 To remove the currently installed certificate for re-testing the -ExportCert scenario, run the following command:
+    # c2.1 Remove install self-signed certificates
+    Get-ChildItem -Path $SelfSignedCertParams.CertStoreLocation | Where-Object { $_.Subject -match "-PSScriptCipherCert" } | Remove-Item -Force
 #>
 #endregion INTEGRATION TESTING - MANUAL
