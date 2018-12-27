@@ -617,7 +617,9 @@ If (-not($SuppressPrompts))
         Stop-Transcript -Verbose -ErrorAction SilentlyContinue
     } #end condition
 } # end if
+else
+{
+    Stop-Transcript -ErrorAction SilentlyContinue -Verbose
+} # end else
 
 #endregion SUMMARY
-
-Stop-Transcript -ErrorAction SilentlyContinue -Verbose
