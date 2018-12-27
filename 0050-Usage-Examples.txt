@@ -31,7 +31,7 @@ NOTE: If you are using VSCode to run this script, use this expression to dot sou
     # TASK-ITEM: Update these parameters with your own custom values for your environment.
     $remoteTestMachine = "azrads1003.dev.adatum.com"
     $scriptContent = "Get-ChildItem -Path 'c:\'"
-    $scriptPath = "F:\OneDrive\02.00.00.GENERAL\repos\0000-scripts\0050\Set-CredTest.ps1"
+    $scriptPath = "\\azrdev1001\f$\OneDrive\02.00.00.GENERAL\repos\0000-scripts\0050\Set-CredTest.ps1"
 
 	# Test case 1.0: To test a command interactively, use the following expression:
     # tc1.1 Interactive command test
