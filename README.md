@@ -1,36 +1,31 @@
 # Introduction 
-This project will first check a provided list of servers to determine whether they are online and accessible for PowerShell remoting. 
-Next, it will check the primary interface for a static IPv4 address. For each server that has a static IP address, 
-the script will then change ONLY the preferred and alternate DNS entries in the DNS search order list to other specified new target values.
-If a server has more than two entries in the search order list, they will NOT be modified.
-This means if DNS1 = 10.10.10.10, then DNS1 = 10..10.10.100, and if DNS2 = 10.10.10.11, then DNS2 = 10.10.10.101 
-A running report is also be generated to reflect the servers online availability and any changes that were made changes.
+This project aims to secure PowerShell credentials used in scripts or interactively from the console, whether as an ad-hoc job or scheduled. 
+The script in this project will use a document encryption certificate to encrypt and decrypt service account passwords used to execute interactive or scheduled scripts or commands.
 
 # Getting Started
 1.	Installation process
-        To use this script, first run the following commands that will download the script to a subfolder named UpdateDnsServerList in your user profile $home directory. 
+
+        To use this script, first extract the repository contents to a new directory. 
+        You can use the directory named 0051 in your user profile $home folder. 
+        You can use the powershell command to create the sub-directory:
+
+        New-Path $home\0051 -ItemType Directory
+
+        Next, from the repository page at: https://github.com/autocloudarc/0051-Set-SelfSignedCertCreds.ps1, Use the green <Clone or download> button on the right, then select <Download Zip>.
+
         The default user profile paths for Windows 10/8.1/7 client versions are: c:\users\<userid>, where "userid" represents the currently logged on username.
-        The full path to the PowerShell script that is downloaded then will be c:\users\<userid>\UpdateDnsServerList\UpdateDnsServerList.ps1 
+        The full path to the PowerShell script that is downloaded then will be c:\users\<userid>\0050\Set-SelfSignedCertCreds.ps1 
 
 2.	Software dependencies
-        This script requires the Windows PowerShell 5.1 version, which will allow automatic downloading and installation of any required modules from the www.powershellgallery.com repository.
+        This script may require the Windows PowerShell 5.1 version, which will allow automatic downloading and installation of any required modules from the www.powershellgallery.com repository if they are required from any future updates.
 
 3.	Latest releases
         See commits
 
-4.	References
-    a. https://autocloudarc.visualstudio.com/0029-UpdateDnsServersList
-    b. https://docs.microsoft.com/en-us/azure/storage/files/storage-how-to-use-files-windows 
-    
+4.	References:
+        [Project Link] (https://github.com/autocloudarc/0051-Set-SelfSignedCertCreds.ps1)
 
-# Test
-You can test this script without making any changes by using the -WhatIf parameter. 
-You can also revert to the original DNS settings by using the -Rollback parameter.
-Examples:
-.\UpdateDnsServerList -Path <PathToServerListFile> -WhatIf
-.\UpdateDNsServerList -Path <PathToServerListFile> -
-
-# Contribute
+# Feedback
 Please feel free to get involved by reporting problems, suggest ideas or improve this project by making the code better. 
 To report problems and suggest ideas, please create an issue for this script, which will ensure that it is properly addressed.
 For contributing to this project, please follow the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/) for coding/testing practices and pull request requirements.
