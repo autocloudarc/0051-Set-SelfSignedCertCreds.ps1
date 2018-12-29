@@ -8,6 +8,9 @@ Desktop.ini
 # Log files
 *.log
 
+# Text files
+.txt
+
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
 
