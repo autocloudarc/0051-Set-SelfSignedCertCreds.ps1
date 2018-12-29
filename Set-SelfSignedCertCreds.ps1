@@ -7,9 +7,7 @@
 Secure credentials in automated scripts.
 
 .DESCRIPTION
-Scripts will use a client authentication certificate associated with a service account which has at least Builtin\Administrator privileges.
-This certificate will be imported to the current user certificate store for the service account.
-The certificate will be tied to the credential by using the thumbprint property.
+This scripts will use a document encryption certificate to encrypt and decrypt service account passwords used to execute interactive or scheduled scripts or commands.
 
 .PARAMETER netDirectory
 Directory path where the encrypted password file pw.txt, clear-text username file upn.txt and the self-signed client authentication certificate PSScriptCipherCert.pfx will be stored.
