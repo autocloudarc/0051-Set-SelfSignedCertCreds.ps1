@@ -3,7 +3,7 @@
 #Requires -RunAsAdministrator
 
 <#
-.SYNOPSIS
+.SYNOP\SIS
 Secure credentials in automated scripts.
 
 .DESCRIPTION
@@ -152,6 +152,7 @@ This posting is provided "AS IS" with no warranties, and confers no rights.
 8: https://docs.microsoft.com/en-us/powershell/module/Microsoft.PowerShell.Security/ConvertFrom-SecureString?view=powershell-5.0
 9: https://en.wikipedia.org/wiki/Data_Protection_API#frb-inline
 10: http://www.powertheshell.com/searching-for-file-attributes/
+11: https://blogs.technet.microsoft.com/ashleymcglone/2017/08/29/function-to-create-certificate-template-in-active-directory-certificate-services-for-powershell-dsc-and-cms-encryption/
 
 .COMPONENT
 Task Scheudler, Scripts, Authentication, Credentials, Certificates
